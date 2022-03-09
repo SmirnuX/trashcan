@@ -1,0 +1,10 @@
+{
+  "name": "dewatermark",
+  "version": "0.0.1",
+  "description": "",
+  "main": "bin/main.js",
+  "type": "module",
+  "bin": {
+    "hello": "./bin/main.js"
+  }
+}
