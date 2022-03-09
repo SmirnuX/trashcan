@@ -85,10 +85,18 @@ int main(int argc, char* argv[])	//The only argument is file with matrix.
 	}
 	unique_ptr<double> A_accumulated(new double[cols]);
 	unique_ptr<double> B_accumulated(new double[rows]);
+	unique_ptr<uint> A_probabilities(new uint[cols]);
+	unique_ptr<uint> B_probabilities(new uint[rows]);
 	for (uint i = 0; i < cols; i++)
+	{
 		A_accumulated.get()[i] = 0;
+		A_probabilities.get()[i] = 0;
+	}
 	for (uint i = 0; i < rows; i++)
+	{
 		B_accumulated.get()[i] = 0;	
+		B_probabilities.get()[i] = 0;
+	}
 	uint next_A_move = first_move;
 	uint next_B_move;
 	double max_min_loss;
@@ -99,6 +107,7 @@ int main(int argc, char* argv[])	//The only argument is file with matrix.
 		uint curr_A_move = next_A_move;
 		//Player A move
 		double min_loss = 999999;
+		A_probabilities.get()[next_A_move] ++;
 		for (uint j = 0; j < cols; j++)
 		{
 			A_accumulated.get()[j] += matrix[next_A_move][j];
@@ -107,8 +116,10 @@ int main(int argc, char* argv[])	//The only argument is file with matrix.
 				min_loss = A_accumulated.get()[j];
 				next_B_move = j;
 			}
-		}
+		}	
+
 		//Player B move
+		B_probabilities.get()[next_B_move] ++;
 		double max_win = 0;
 		for (uint j = 0; j < rows; j++)
 		{
@@ -168,6 +179,31 @@ int main(int argc, char* argv[])	//The only argument is file with matrix.
 		cout << setw(2*col_size+2) << max_win << "|" << setw(7) << min_max_win <<" ||";
 		cout << setw(7) << delta << "||" <<endl;
 	}
+	cout << setfill('=') <<setw(55)<<endl;
+	cout << "Results: " << endl;
+	cout << "\t Cost:\t" << (min_max_win + max_min_loss)/2 << endl;
+	cout << "\t Strategy probabilities:       ";
+	for (uint i = 0; i < rows; i++)
+	{
+		cout << setfill(' ') << "A" << i+1 << setw(8);
+	}
+	cout << endl << '\t' << setw(31) << " ";
+	for (uint i = 0; i < rows; i++)
+	{
+		cout << (double)A_probabilities.get()[i] / it_count << setw(9);
+	}
+	cout << endl << '\t' << setw(23) << " ";
+
+	for (uint i = 0; i < cols; i++)
+	{
+		cout << setfill(' ') << "B" << i+1 << setw(8);
+	}
+	cout << endl << '\t' << setw(31) << " ";
+	for (uint i = 0; i < cols; i++)
+	{
+		cout << (double)B_probabilities.get()[i] / it_count << setw(9);
+	}
+	cout << endl;
 	//Clearing memory
 	for (uint i = 0; i < rows; i++)
 	{
