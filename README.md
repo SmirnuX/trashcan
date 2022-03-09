@@ -11,5 +11,18 @@ Main rule for this repository is Four U Rule:
 
 ## Exhibition
 ### Game theory
- [link](/game_theory)
- Simple realization of iterative method of solving antagonistic games. 
+ 
+ Simple realization of iterative method of solving antagonistic games. [link](/game_theory)
+ 
+ Usage: 
+ 
+ `./gt <filename> [number of iterations] [first strategy of player A]`
+ 
+ ### UnWatermark TG
+ 
+ Simple script in javascript for deleting parts of JSON with provided name. [link](/UnWatermarkTG)
+ 
+ Usage: 
+ 
+ To actually use it for unwatermarking Telegram stickers, convert files of stickers to JSON, find name of watermark layers (if they are named), then use this script and convert back from JSON to sticker.
+
