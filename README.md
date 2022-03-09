@@ -11,5 +11,5 @@ Main rule for this repository is Four U Rule:
 
 ## Exhibition
 ### Game theory
-
+ [link](tree/master/game_theory)
  Simple realization of iterative method of solving antagonistic games. 
