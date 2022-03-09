@@ -1,2 +1,2 @@
-# trashcan
-Some small programs with potential. Or not.
+# 🗑️Trash Can
+Code too small or too bad to have separate repository. But maybe, sometimes...
