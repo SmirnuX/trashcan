@@ -11,10 +11,13 @@ Main rule for this repository is Four U Rule:
    * [Game theory](#Game-theory)
    * [UnWatermark TG](#UnWatermark-TG)
    * [Tipa CFS](#Tipa-CFS)
+   * [Weiler_cut](#Weiler-cut)
 
 # Game theory
  
- Simple realization of iterative method of solving antagonistic games. [link](/game_theory)
+[link](/game_theory)
+
+ Simple realization of iterative method of solving antagonistic games. 
  
  Usage: 
  
@@ -23,7 +26,9 @@ Main rule for this repository is Four U Rule:
  
 # UnWatermark TG
  
- Simple script in javascript for deleting parts of JSON with provided name. [link](/UnWatermarkTG)
+[link](/UnWatermarkTG)
+
+ Simple script in javascript for deleting parts of JSON with provided name. 
  
  Usage: 
  
@@ -32,5 +37,14 @@ Main rule for this repository is Four U Rule:
 
  # Tipa CFS
  
- Attempt to model Linux CFS (Completely Fair Scheduler). Not stable, working on old version of QT and probably isn't correct. [link](/tipa_CFS)
+[link](/tipa_CFS)
+
+ Attempt to model Linux CFS (Completely Fair Scheduler). Not stable, working on old version of QT and probably isn't correct. 
+
+
+ # Weiler Cut
+
+[link](/Weiler_cut)
+
+ Simple app to test Weiler Atherton polygon clipping algorithm. It was meant to be included in [crystalls](https://github.com/SmirnuX/crystalls), but in current version it's too buggy.
  
