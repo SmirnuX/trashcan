@@ -1,7 +1,7 @@
 # 🗑️Trash Can
 Code too small or too bad to have separate repository. But maybe, sometimes...
 
-Main rules for this repository is Four U Rule:
+Main rules for this repository are Four U Rule:
  - Untested
  - Uncommented
  - Unsupported
