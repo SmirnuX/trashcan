@@ -12,6 +12,7 @@ Main rules for this repository are Four U Rule:
    * [UnWatermark TG](#UnWatermark-TG)
    * [Tipa CFS](#Tipa-CFS)
    * [Weiler_cut](#Weiler-cut)
+   * [Tipa_linpack](#Tipa-Linpack)
 
 # Game theory
  
@@ -48,3 +49,17 @@ Main rules for this repository are Four U Rule:
 
  Simple app to test Weiler Atherton polygon clipping algorithm. It was meant to be included in [crystalls](https://github.com/SmirnuX/crystalls), but in current version it's too buggy.
  
+ Usage:
+ 
+ You can move shapes by pressing arrow keys. On the right side of two shapes you will see two colums of shapes - inner and outer lists.
+ 
+ 
+ # Tipa Linpack
+
+[link](/tipa_linpack)
+
+ Attempt to recreate linpack with multithreading. Cause base algorithmm of solving linear equations can't be done in parallel well, it just launches one linear equation per thread. 
+ 
+  Usage: 
+ 
+ `./linpack [size of matrix = 1000] [number of threads = 1] [number of tests = 1]`
