@@ -1,7 +1,9 @@
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <chrono>
 #include <ctime>
 
@@ -15,8 +17,9 @@ struct matrix
     real* B;
     real* x;
     uint* p;
+    unsigned long long flops;
+    std::chrono::duration<double> time_elapsed;
 };
-
 
 matrix matrix_alloc(uint size);
 void matrix_generate(matrix* mx, real max);
@@ -26,9 +29,9 @@ real* matrix_solve(matrix* mx); //Solve linear equation
 
 void run_test(matrix* mx);
 
-unsigned long long flops;
-thread_local unsigned long long thr_flops;
-std::mutex flops_mutex;
+std::condition_variable start_test;
+std::mutex start_mutex;
+bool start = false;
 
 int main(int argc, char* argv[])
 {
@@ -56,7 +59,7 @@ int main(int argc, char* argv[])
     matrix* mx = new matrix[thread_count];
     uint** p = new uint*[thread_count]; //Permutation matrices
     real** x = new real* [thread_count];    //Result vectors
-    for (uint i = 0; i < thread_count; i++)
+    for (uint i = 0; i < thread_count; i++) //Allocating memory for all matrices/vectors for all threads
     {
         mx[i] = matrix_alloc(N);
         p[i] = new uint[N];
@@ -64,33 +67,45 @@ int main(int argc, char* argv[])
         mx[i].x = x[i];
         mx[i].p = p[i];
     }
-    std::thread* threads = new std::thread[thread_count];
+    std::thread* threads = new std::thread[thread_count - 1];
 
     for (uint i = 0; i < repeat; i++)
     {
+        for (uint j = 0; j < thread_count; j++)
+        {
+            mx[i].flops = 0;
+        }
         std::cout << "Setting up test " << i+1 << "/" <<repeat<<'\n';
         for (uint j = 0; j < thread_count; j++)
             matrix_generate(mx + j, 1.0f);
         std::cout << "Starting solving of " << thread_count << " linear equations: ";
-        flops = 0;
-        auto start = std::chrono::high_resolution_clock::now(); //!Timer start
-        //Start tests
-
-        for (uint j = 0; j < thread_count; j++)
+        //Preparing tests
+        for (uint j = 0; j < thread_count-1; j++)
             threads[j] = std::thread([mx, j] () {run_test(mx + j);});
+        //Starting tests
+        {
+            std::unique_lock<std::mutex>(start_mutex);
+            start = true;
+        }
+        start_test.notify_all();
+        run_test(mx + thread_count - 1);
 
-        for (uint j = 0; j < thread_count; j++)
+        for (uint j = 0; j < thread_count-1; j++)
             threads[j].join();
-        
-        auto end = std::chrono::high_resolution_clock::now();   //!Timer end
-        std::chrono::duration<double> diff = end-start;
-        std::cout << diff.count() << "s\n";
-        double MFlops = flops;
-        MFlops /= diff.count() * 1000000;
-        std::cout << "MFlops = " << MFlops << '\n';
+
+        //Results
+        //Result for each thread
+        double total_flops = 0;
+        for (uint j = 0; j < thread_count; j++) //Allocating memory for all matrices/vectors for all threads
+        {
+            std::cout    << "Thread # "<< j << "\n\t Time elapsed: " << mx[j].time_elapsed.count()
+                    << "s.\n\t FP operations: " << mx[j].flops 
+                    << "\n\t Total MFlops: " << std::fixed << mx[j].flops / 1000000.0f /  mx[j].time_elapsed.count() << "\n\n";
+            total_flops += mx[j].flops / 1000000.0f / mx[j].time_elapsed.count();
+        }
+        std::cout << "Total MFlops: " << std::fixed << std::setprecision(8) << total_flops << "\n\n";
     }
     
-
     for (uint i = 0; i < thread_count; i++)
     {
         matrix_dealloc(mx+i);
@@ -100,8 +115,6 @@ int main(int argc, char* argv[])
     delete[] mx;
     delete[] threads;
 
-
-    std::cout << "End";
     return 0;
 }
 
@@ -162,7 +175,7 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
                 maxA = mx->A[k][i];
                 imax = k;
             }
-            thr_flops++;
+            mx->flops++;
         }
 
         if (imax != i) //Changing order of rows
@@ -179,12 +192,12 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
         for (uint j = i+1; j < mx->size; j++)
         {
             mx->A[j][i] /= mx->A[i][i];
-            thr_flops++;
+            mx->flops++;
 
             for (uint k = i+1; k < mx->size; k++)
             {
                 mx->A[j][k] -= mx->A[j][i] * mx->A[i][k];
-                thr_flops += 2;
+                mx->flops += 2;
             }
         }
     }
@@ -198,7 +211,7 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
         for(uint k = 0; k < i; k++)
         {
             x[i] -= mx->A[i][k] * x[k];
-            thr_flops += 2;
+            mx->flops += 2;
         }
     }
 
@@ -207,11 +220,11 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
         for (uint k = i+1; k < mx->size; k++)
         {
             x[i] -= mx->A[i][k] * x[k];
-            thr_flops += 2;
+            mx->flops += 2;
         }
             
         x[i] /= mx->A[i][i];
-        thr_flops++;
+        mx->flops++;
         if (i == 0)
             break;
     }
@@ -221,9 +234,12 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
 
 void run_test(matrix* mx)
 {
-    thr_flops = 0;
+    {
+        std::unique_lock<std::mutex> lk(start_mutex);
+        start_test.wait(lk, []{return start;});
+    }
+    auto start = std::chrono::high_resolution_clock::now(); //!Timer start
     matrix_solve(mx);
-    
-    std::lock_guard<std::mutex> lock(flops_mutex);
-    flops += thr_flops;
+    auto end = std::chrono::high_resolution_clock::now();   //!Timer end
+    mx->time_elapsed = end-start;
 }
