@@ -1,5 +1,5 @@
 all:
-	g++ main.c -o linpack -lm -pthread
+	g++ main.c -o linpack -lm -pthread -O3
 
 run:
 	g++ main.c -o linpack -lm -pthread

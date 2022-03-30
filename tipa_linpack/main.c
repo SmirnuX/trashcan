@@ -6,12 +6,15 @@
 #include <ctime>
 
 typedef float real;
+//typedef unsigned int uint;    //For some compilers
 
 struct matrix
 {
     uint size;
     real** A;
     real* B;
+    real* x;
+    uint* p;
 };
 
 
@@ -51,8 +54,16 @@ int main(int argc, char* argv[])
     std::cout << "Threads selected: " << thread_count << "/" << std::thread::hardware_concurrency() << '\n';
     std::srand(std::time(NULL));
     matrix* mx = new matrix[thread_count];
+    uint** p = new uint*[thread_count]; //Permutation matrices
+    real** x = new real* [thread_count];    //Result vectors
     for (uint i = 0; i < thread_count; i++)
+    {
         mx[i] = matrix_alloc(N);
+        p[i] = new uint[N];
+        x[i] = new real[N];
+        mx[i].x = x[i];
+        mx[i].p = p[i];
+    }
     std::thread* threads = new std::thread[thread_count];
 
     for (uint i = 0; i < repeat; i++)
@@ -71,7 +82,6 @@ int main(int argc, char* argv[])
         for (uint j = 0; j < thread_count; j++)
             threads[j].join();
         
-
         auto end = std::chrono::high_resolution_clock::now();   //!Timer end
         std::chrono::duration<double> diff = end-start;
         std::cout << diff.count() << "s\n";
@@ -82,7 +92,11 @@ int main(int argc, char* argv[])
     
 
     for (uint i = 0; i < thread_count; i++)
+    {
         matrix_dealloc(mx+i);
+        delete[] x[i];
+        delete[] p[i];
+    }
     delete[] mx;
     delete[] threads;
 
@@ -133,7 +147,7 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
     //LU decompose: A = L*U
     real maxA;
     uint imax;
-    uint* pivot = new uint[mx->size];   //Permutation matrix as vector
+    uint* pivot = mx->p;
     for (uint i = 0; i < mx->size; i++)
         pivot[i] = i;
     for (uint i = 0; i < mx->size; i++)
@@ -148,9 +162,10 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
                 maxA = mx->A[k][i];
                 imax = k;
             }
+            thr_flops++;
         }
 
-        if (imax != i) //Changinf order of rows
+        if (imax != i) //Changing order of rows
         {
             uint tmp = pivot[i];
             pivot[i] = pivot[imax];
@@ -175,7 +190,7 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
     }
 
     //Actually solving
-    real* x = new real[mx->size];
+    real* x = mx->x;
     for (uint i = 0; i < mx->size; i++)
     {
         x[i] = mx->B[pivot[i]];
@@ -183,7 +198,7 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
         for(uint k = 0; k < i; k++)
         {
             x[i] -= mx->A[i][k] * x[k];
-            thr_flops++;
+            thr_flops += 2;
         }
     }
 
@@ -192,18 +207,14 @@ real* matrix_solve(matrix* mx)  //Solve linear equation
         for (uint k = i+1; k < mx->size; k++)
         {
             x[i] -= mx->A[i][k] * x[k];
-            thr_flops++;
+            thr_flops += 2;
         }
             
-
         x[i] /= mx->A[i][i];
         thr_flops++;
         if (i == 0)
             break;
     }
-
-    delete[] x;
-    delete[] pivot;
 
     return NULL;
 }
