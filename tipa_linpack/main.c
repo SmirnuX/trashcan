@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     {
         for (uint j = 0; j < thread_count; j++)
         {
-            mx[i].flops = 0;
+            mx[j].flops = 0;
         }
         std::cout << "Setting up test " << i+1 << "/" <<repeat<<'\n';
         for (uint j = 0; j < thread_count; j++)
