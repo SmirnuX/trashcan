@@ -447,13 +447,13 @@ void rbnode::draw_node(QPainter* painter, int x, int y, int r, int depth)
     for (int i = 0; i < depth; i++)
         delta*=2;
     delta*=r*0.4;
-    if (left != NULL)
+    if (left != NULL)   //Connection to the left child
     {
         painter->setPen(QColor(0,0,0));
         painter->drawLine(x, y, x - delta, y + 2*r);
         left->draw_node(painter, x - delta, y + 2*r, r, depth-1);
     }
-    if (right != NULL)
+    if (right != NULL)  //Connection to the right child
     {
         painter->setPen(QColor(0,0,0));
         painter->drawLine(x, y, x + delta, y + 2*r);
@@ -466,8 +466,20 @@ void rbnode::draw_node(QPainter* painter, int x, int y, int r, int depth)
         painter->setPen(QColor(0,0,255));
         painter->drawEllipse(x-1.5*r, y-1.5*r, 3*r, 3*r);
     }
+
     QBrush brush(QColor(255,255,255));
     painter->setBrush(brush);
+    if (color == 1)
+        painter->setPen(QColor(255,0,0));
+    else
+        painter->setPen(QColor(0,0,0));
+    painter->drawEllipse(x-r, y-r, 2*r, 2*r);
+    QPen penn(QColor(180, 180, 180));
+    penn.setWidthF(1 + r * 0.2);
+    painter->setPen(penn);
+
+    painter->drawArc(x-r, y-r, 2*r, 2*r, 0, -floor(360 * 16 * (double)content->vruntime/content->maxtime ));
+
     if (color == 1)
         painter->setPen(QColor(255,0,0));
     else
