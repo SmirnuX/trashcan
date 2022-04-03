@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QTime time=QTime::currentTime();
     timeslice = 6;
     time_left = timeslice;
-    qsrand(time.msecsTo(QTime(0,0)));
+    srand(time.msecsTo(QTime(0,0)));
     runtime = 0;
     time_to_add = 1;
     ui->setupUi(this);
@@ -58,7 +58,7 @@ void MainWindow::AddNode()
         }
         else
         {
-            name[i] = name[i].toAscii() + 1;
+            name[i] = QChar(name[i].toLatin1() + 1);  //Should be next letter
             break;
         }
     }
@@ -98,7 +98,7 @@ void MainWindow::CalculateIdealTime()
 
 void MainWindow::RandTime()
 {
-    ui->NewProcessMaxTime->setValue(1+qrand()%99);
+    ui->NewProcessMaxTime->setValue(1+rand()%99);
 }
 
 void MainWindow::Run()

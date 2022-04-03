@@ -497,7 +497,7 @@ int rbnode::depth(int a)
 
 canvas::canvas(QWidget* parent):QWidget(parent)    //Конструктор окна
 {
-    QTextCodec::setCodecForTr(QTextCodec::codecForName ("Windows-1251"));   //Для отображения кириллицы
+    //QTextCodec::setCodecForTr(QTextCodec::codecForName ("Windows-1251"));   //Для отображения кириллицы
     tree = NULL;
 }
 

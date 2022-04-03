@@ -3,7 +3,6 @@
 #include <Qt>
 #include <QColor>
 #include <QPainter>
-#include <QTextCodec>
 #include <QDialog>
 #include <QDebug>
 #include <QMouseEvent>
