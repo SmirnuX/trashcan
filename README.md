@@ -13,6 +13,7 @@ Main rules for this repository are Four U Rule:
    * [Tipa CFS](#Tipa-CFS)
    * [Weiler_cut](#Weiler-cut)
    * [Tipa_linpack](#Tipa-Linpack)
+   * [Tipa_Caesar](#Tipa-Caesar)
 
 # Game theory
  
@@ -47,6 +48,8 @@ Main rules for this repository are Four U Rule:
 
 [link](/Weiler_cut)
 
+ <img src="images/weiler_image.png" alt="" width="600"/>
+
  Simple app to test Weiler Atherton polygon clipping algorithm. It was meant to be included in [crystalls](https://github.com/SmirnuX/crystalls), but in current version it's too buggy.
  
  Usage:
@@ -63,3 +66,12 @@ Main rules for this repository are Four U Rule:
   Usage: 
  
  `./linpack [size of matrix = 1000] [number of threads = 1] [number of tests = 1]`
+
+ # Tipa Caesar
+
+[link](/tipa_caesar)
+
+ <img src="images/caesar_image.png" alt="" width="600"/>
+
+Tool to encrypt or decipher text in russian language using Caesar cipher with keyword.
+caesar_image.png
